@@ -1,2 +1,1 @@
-залуспа
-sefsfe
+print("hi")
