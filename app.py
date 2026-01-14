@@ -9,3 +9,13 @@ app = FastAPI(title="D&D Cards")
 templates = Jinja2Templates(directory="templates")
 
 CARDS_FILE = "data/cards.json"
+
+def load_cards():
+    if not os.path.exists(CARDS_FILE):
+        os.makedirs(os.path.dirname(CARDS_FILE), exist_ok=True)
+        with open(CARDS_FILE, "w", encoding="utf-8") as f:
+            json.dump([], f, ensure_ascii=False, indent=2)
+        return []
+    with open(CARDS_FILE, "r", encoding="utf-8") as f:
+        return json.load(f)
+    
