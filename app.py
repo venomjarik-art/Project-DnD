@@ -6,3 +6,6 @@ import json
 import os
  
 app = FastAPI(title="D&D Cards") 
+templates = Jinja2Templates(directory="templates")
+
+CARDS_FILE = "data/cards.json"
