@@ -4,3 +4,5 @@ from fastapi.templating import Jinja2Templates
 import random
 import json
 import os
+ 
+app = FastAPI(title="D&D Cards") 
