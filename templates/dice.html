@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>🎲 Бросок кубиков</h1>
+
+<!-- Форма выбора кубика -->
+<form method="post">
+    <h3>Выберите кубик:</h3>
+    {% for d in [4, 6, 8, 10, 12, 20, 100] %}
+        <button type="submit" name="sides" value="{{ d }}">d{{ d }}</button>
+    {% endfor %}
+</form>
+
+<!-- Отображение результата -->
+{% if result is not none %}
+    <div style="margin-top: 20px; padding: 15px; background: #e8f5e9; border-radius: 5px;">
+        <h2>Выпало: <strong>{{ result }}</strong> на d{{ sides }}!</h2>
+    </div>
+{% endif %}
+
+<br>
+<a href="/">← Назад к картам</a>
+{% endblock %}
