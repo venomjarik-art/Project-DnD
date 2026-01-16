@@ -19,7 +19,7 @@ def load_cards():
     with open(CARDS_FILE, "r", encoding="utf-8") as f:
         return json.load(f)
     
-    def save_cards(cards):
+def save_cards(cards):
          with open(CARDS_FILE, "w", encoding="utf-8") as f:
           json.dump(cards, f, ensure_ascii=False, indent=2)
 
@@ -35,3 +35,12 @@ async def add_card(
     description: str = Form("")
 ):
 
+    cards = load_cards()
+    new_id = max([c.get("id", 0) for c in cards], default=0) + 1
+    cards.append({
+        "id": new_id,
+        "name": name.strip(),
+        "description": description.strip()
+    })
+    save_cards(cards)
+    return templates.TemplateResponse("index.html", {"request": request, "cards": cards})
