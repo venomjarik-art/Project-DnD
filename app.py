@@ -22,3 +22,9 @@ def load_cards():
     def save_cards(cards):
          with open(CARDS_FILE, "w", encoding="utf-8") as f:
           json.dump(cards, f, ensure_ascii=False, indent=2)
+
+@app.get("/", response_class=HTMLResponse)
+async def home(request: Request):
+    cards = load_cards()
+    return templates.TemplateResponse("index.html", {"request": request, "cards": cards})
+    
