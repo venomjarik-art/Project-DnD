@@ -53,3 +53,9 @@ async def dice_page(request: Request, result: int = None, sides: int = None):
         {"request": request, "result": result, "sides": sides}
     )
 
+@app.post("/dice", response_class=HTMLResponse)
+async def roll_dice(
+    request: Request,
+    sides: int = Form(...)
+):
+    
