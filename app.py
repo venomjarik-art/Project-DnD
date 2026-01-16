@@ -72,3 +72,12 @@ async def roll_dice(
 async def api_get_cards():
     return load_cards()
 
+@app.post("/api/cards")
+async def api_add_card(card: dict):
+    cards = load_cards()
+    new_id = max([c.get("id", 0) for c in cards], default=0) + 1
+    card["id"] = new_id
+    cards.append(card)
+    save_cards(cards)
+    return {"status": "ok", "id": new_id}
+
