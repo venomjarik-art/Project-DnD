@@ -44,3 +44,12 @@ async def add_card(
     })
     save_cards(cards)
     return templates.TemplateResponse("index.html", {"request": request, "cards": cards})
+
+@app.get("/dice", response_class=HTMLResponse)
+async def dice_page(request: Request, result: int = None, sides: int = None):
+    # result и sides передаются как query-параметры после POST
+    return templates.TemplateResponse(
+        "dice.html",
+        {"request": request, "result": result, "sides": sides}
+    )
+
