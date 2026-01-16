@@ -28,3 +28,10 @@ async def home(request: Request):
     cards = load_cards()
     return templates.TemplateResponse("index.html", {"request": request, "cards": cards})
     
+@app.post("/", response_class=HTMLResponse)
+async def add_card(
+    request: Request,
+    name: str = Form(...),
+    description: str = Form("")
+):
+
