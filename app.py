@@ -67,3 +67,8 @@ async def roll_dice(
         "dice.html",
         {"request": request, "result": result, "sides": sides}
     )
+
+@app.get("/api/cards")
+async def api_get_cards():
+    return load_cards()
+
