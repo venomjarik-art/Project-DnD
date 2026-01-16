@@ -81,3 +81,9 @@ async def api_add_card(card: dict):
     save_cards(cards)
     return {"status": "ok", "id": new_id}
 
+@app.get("/api/roll/{sides}")
+async def api_roll_dice(sides: int):
+    if sides not in [4, 6, 8, 10, 12, 20, 100]:
+        return {"error": "Недопустимое количество граней"}
+    return {"sides": sides, "result": random.randint(1, sides)}
+
