@@ -58,4 +58,12 @@ async def roll_dice(
     request: Request,
     sides: int = Form(...)
 ):
-    
+    if sides not in [4, 6, 8, 10, 12, 20, 100]:
+        result = None
+    else:
+        result = random.randint(1, sides)
+    # Перенаправляем на GET /dice с параметрами
+    return templates.TemplateResponse(
+        "dice.html",
+        {"request": request, "result": result, "sides": sides}
+    )
