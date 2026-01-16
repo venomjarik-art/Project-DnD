@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>🎴 Мои D&D Карты</h1>
+
+<!-- Форма добавления карты -->
+<form method="post">
+    <h3>Добавить новую карту</h3>
+    <input type="text" name="name" placeholder="Название карты" required>
+    <br>
+    <textarea name="description" placeholder="Описание (опционально)" rows="3"></textarea>
+    <br>
+    <button type="submit">Добавить карту</button>
+</form>
+
+<hr>
+
+<!-- Список карт -->
+<h2>Список карт:</h2>
+{% if cards %}
+    {% for card in cards %}
+        <div class="card">
+            <strong>{{ card.name }}</strong>
+            {% if card.description %}
+                <br><em>{{ card.description }}</em>
+            {% endif %}
+        </div>
+    {% endfor %}
+{% else %}
+    <p>Пока нет карт.</p>
+{% endif %}
+
+<br>
+<a href="/dice">🎲 Бросить кубики</a>
+{% endblock %}
