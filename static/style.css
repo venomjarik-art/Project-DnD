@@ -1,13 +1,18 @@
     body {
     font-family: Arial, sans-serif;
     padding: 20px;
-    background: #f5f5f5;
+    background-image: url("photo_2026-01-21_17-01-53.jpg");
+    background-size: cover;       
+    background-position: center;  
+    background-repeat: no-repeat; 
+    background-attachment: fixed; 
+    min-height: 100vh;           
 }
 
 .container {
     max-width: 800px;
     margin: 0 auto;
-    background: white;
+    background: rgb(62, 199, 126);
     padding: 20px;
     border-radius: 8px;
 }
@@ -16,7 +21,7 @@
     margin: 10px 0;
     padding: 10px;
     border-left: 4px solid #7b2cbf;
-    background: #fafafa;
+    background: #c27eef;
 }
 
 form {
@@ -32,7 +37,8 @@ input, textarea, button {
     display: inline-block;
     margin: 5px;
     padding: 10px;
-    background: #e0e0e0;
-    border: 1px solid #ccc;
+    background: #7a0000;
+    border: 1px solid #992222;
     cursor: pointer;
 }
+
