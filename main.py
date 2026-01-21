@@ -1,11 +1,15 @@
+
 from fastapi import FastAPI, Request, Form
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
+from fastapi.staticfiles import StaticFiles 
 import random
 import json
 import os
- 
-app = FastAPI(title="D&D Cards") 
+
+app = FastAPI(title="D&D Cards")
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
 templates = Jinja2Templates(directory="templates")
 
 CARDS_FILE = "data/cards.json"
@@ -20,8 +24,8 @@ def load_cards():
         return json.load(f)
     
 def save_cards(cards):
-         with open(CARDS_FILE, "w", encoding="utf-8") as f:
-          json.dump(cards, f, ensure_ascii=False, indent=2)
+    with open(CARDS_FILE, "w", encoding="utf-8") as f:
+        json.dump(cards, f, ensure_ascii=False, indent=2)
 
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request):
@@ -34,7 +38,6 @@ async def add_card(
     name: str = Form(...),
     description: str = Form("")
 ):
-
     cards = load_cards()
     new_id = max([c.get("id", 0) for c in cards], default=0) + 1
     cards.append({
@@ -47,7 +50,6 @@ async def add_card(
 
 @app.get("/dice", response_class=HTMLResponse)
 async def dice_page(request: Request, result: int = None, sides: int = None):
-    # result и sides передаются как query-параметры после POST
     return templates.TemplateResponse(
         "dice.html",
         {"request": request, "result": result, "sides": sides}
@@ -62,7 +64,6 @@ async def roll_dice(
         result = None
     else:
         result = random.randint(1, sides)
-    # Перенаправляем на GET /dice с параметрами
     return templates.TemplateResponse(
         "dice.html",
         {"request": request, "result": result, "sides": sides}
@@ -86,4 +87,3 @@ async def api_roll_dice(sides: int):
     if sides not in [4, 6, 8, 10, 12, 20, 100]:
         return {"error": "Недопустимое количество граней"}
     return {"sides": sides, "result": random.randint(1, sides)}
-
