@@ -13,11 +13,31 @@ app = FastAPI(title="Game API")
 app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
 
-# ==================== БАЗА ДАННЫХ ====================
-users_db = {
-    "admin": {"password": "admin123", "email": "admin@example.com"},
-    "user1": {"password": "password123", "email": "user1@example.com"}
-}
+# ==================== НАСТРОЙКИ БАЗЫ ДАННЫХ ====================
+DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://postgres:password@localhost:5432/card_game_db")
+
+# Модели данных
+class UserRegister(BaseModel):
+    username: str
+    password: str
+    email: Optional[str] = None
+
+#новое
+class Card(BaseModel):
+    id: int
+    name: str
+    hp: int
+    intelligence: int
+    strength: int
+    card_type: str
+
+#новое
+class UserWithCards(BaseModel):
+    id: int
+    username: str
+    email: Optional[str]
+    cards: List[Card]
+    total_cards: int
 
 # ==================== HTML СТРАНИЦЫ ====================
 
