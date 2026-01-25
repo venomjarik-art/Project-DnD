@@ -1,35 +1,49 @@
-{% extends "base.html" %}
-
-{% block content %}
-<h1>🎴 Мои D&D Карты</h1>
-
-<!-- Форма добавления карты -->
-<form method="post">
-    <h3>Добавить новую карту</h3>
-    <input type="text" name="name" placeholder="Название карты" required>
-    <br>
-    <textarea name="description" placeholder="Описание (опционально)" rows="3"></textarea>
-    <br>
-    <button type="submit">Добавить карту</button>
-</form>
-
-<hr>
-
-<!-- Список карт -->
-<h2>Список карт:</h2>
-{% if cards %}
-    {% for card in cards %}
-        <div class="card">
-            <strong>{{ card.name }}</strong>
-            {% if card.description %}
-                <br><em>{{ card.description }}</em>
-            {% endif %}
-        </div>
-    {% endfor %}
-{% else %}
-    <p>Пока нет карт.</p>
-{% endif %}
-
-<br>
-<a href="/dice">🎲 Бросить кубики</a>
-{% endblock %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Portal</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        .menu { display: flex; gap: 20px; margin: 20px 0; }
+        .menu a { padding: 10px 20px; background: #007bff; color: white; text-decoration: none; border-radius: 5px; }
+        .menu a:hover { background: #0056b3; }
+        .card { border: 1px solid #ddd; padding: 20px; border-radius: 8px; margin: 20px 0; }
+    </style>
+</head>
+<body>
+    <h1>🎮 Game Portal</h1>
+    
+    <div class="menu">
+        <a href="/">Главная</a>
+        <a href="/login">Войти</a>
+        <a href="/register">Регистрация</a>
+        <a href="/dice">Кости</a>
+    </div>
+    
+    <div class="card">
+        <h2>Добро пожаловать!</h2>
+        <p>Это игровой портал с минималистичным функционалом:</p>
+        <ul>
+            <li><strong>Регистрация</strong> - создайте аккаунт</li>
+            <li><strong>Вход</strong> - авторизуйтесь в системе</li>
+            <li><strong>Кости</strong> - игра в броски кубиков</li>
+        </ul>
+        
+        <h3>Тестовые пользователи:</h3>
+        <ul>
+            <li>Логин: <code>admin</code>, Пароль: <code>admin123</code></li>
+            <li>Логин: <code>user1</code>, Пароль: <code>password123</code></li>
+        </ul>
+    </div>
+    
+    <div class="card">
+        <h3>API Endpoints:</h3>
+        <ul>
+            <li><code>POST /api/dice</code> - бросить кубик (JSON)</li>
+            <li><code>GET /api/users</code> - список пользователей</li>
+        </ul>
+    </div>
+</body>
+</html>

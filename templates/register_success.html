@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Регистрация успешна</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 500px; margin: 100px auto; padding: 20px; text-align: center; }
+        .success { color: green; font-size: 24px; margin: 20px 0; }
+        .user { background: #f8f9fa; padding: 10px; border-radius: 5px; margin: 20px 0; }
+        .actions { margin-top: 30px; }
+        .btn { display: inline-block; margin: 0 10px; padding: 10px 20px; background: #007bff; color: white; text-decoration: none; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <h1>✅ Регистрация успешна!</h1>
+    
+    <div class="success">Пользователь <strong>{{ username }}</strong> успешно зарегистрирован!</div>
+    
+    <div class="user">
+        <p>Теперь вы можете:</p>
+        <ul style="text-align: left; display: inline-block;">
+            <li>Войти в систему</li>
+            <li>Играть в кости</li>
+            <li>Использовать все возможности портала</li>
+        </ul>
+    </div>
+    
+    <div class="actions">
+        <a href="/login" class="btn">Войти в систему</a>
+        <a href="/" class="btn">На главную</a>
+        <a href="/dice" class="btn">Играть в кости</a>
+    </div>
+</body>
+</html>

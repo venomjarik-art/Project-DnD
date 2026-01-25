@@ -1,23 +1,65 @@
-{% extends "base.html" %}
-
-{% block content %}
-<h1>🎲 Бросок кубиков</h1>
-
-<!-- Форма выбора кубика -->
-<form method="post">
-    <h3>Выберите кубик:</h3>
-    {% for d in [4, 6, 8, 10, 12, 20, 100] %}
-        <button type="submit" name="sides" value="{{ d }}">d{{ d }}</button>
-    {% endfor %}
-</form>
-
-<!-- Отображение результата -->
-{% if result is not none %}
-    <div style="margin-top: 20px; padding: 15px; background: #e8f5e9; border-radius: 5px;">
-        <h2>Выпало: <strong>{{ result }}</strong> на d{{ sides }}!</h2>
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Игра в кости</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; }
+        .dice-form { background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; }
+        input, select { width: 100%; padding: 8px; box-sizing: border-box; }
+        button { background: #dc3545; color: white; border: none; padding: 10px 20px; cursor: pointer; font-size: 16px; }
+        .result { background: #e9ecef; padding: 20px; border-radius: 8px; margin: 20px 0; }
+        .dice { font-size: 24px; margin: 5px; }
+        .back { display: block; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <h1>🎲 Игра в кости</h1>
+    
+    <div class="dice-form">
+        <form method="post" action="/dice">
+            <div class="form-group">
+                <label>Количество граней кубика:</label>
+                <select name="sides">
+                    <option value="4">4-гранный (тетраэдр)</option>
+                    <option value="6" selected>6-гранный (стандартный)</option>
+                    <option value="8">8-гранный (октаэдр)</option>
+                    <option value="10">10-гранный</option>
+                    <option value="12">12-гранный (додекаэдр)</option>
+                    <option value="20">20-гранный (икосаэдр)</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>Количество бросков (1-10):</label>
+                <input type="number" name="count" min="1" max="10" value="1">
+            </div>
+            
+            <button type="submit">🎲 Бросить кубик!</button>
+        </form>
     </div>
-{% endif %}
-
-<br>
-<a href="/">← Назад к картам</a>
-{% endblock %}
+    
+    {% if result %}
+    <div class="result">
+        <h2>Результат:</h2>
+        <p><strong>Кубик:</strong> {{ result.sides }}-гранный</p>
+        <p><strong>Бросков:</strong> {{ result.count }}</p>
+        
+        <p><strong>Выпавшие значения:</strong></p>
+        <div>
+            {% for roll in result.rolls %}
+            <span class="dice">🎲{{ roll }}</span>
+            {% endfor %}
+        </div>
+        
+        <p><strong>Сумма:</strong> {{ result.total }}</p>
+        <p><strong>Среднее:</strong> {{ result.average }}</p>
+    </div>
+    {% endif %}
+    
+    <a href="/" class="back">← На главную</a>
+</body>
+</html>
