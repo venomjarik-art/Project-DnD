@@ -1,11 +1,14 @@
-
-from fastapi import FastAPI, Request, Form, HTTPException
+from fastapi import FastAPI, Request, Form, HTTPException, Depends
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
-from typing import Optional
+from typing import Optional, List
 import random
+import asyncpg
+from datetime import datetime
+import os
+from dotenv import load_dotenv
 
 app = FastAPI(title="Game API")
 
@@ -39,20 +42,41 @@ class UserWithCards(BaseModel):
     cards: List[Card]
     total_cards: int
 
+# ==================== РАБОТА С БД ====================
+
+async def get_db_connection():
+    """Создание подключения к БД"""
+    return await asyncpg.connect(DATABASE_URL)
+
+async def get_user_by_username(username: str):
+    """Получение пользователя по имени"""
+    conn = await get_db_connection()
+    try:
+        row = await conn.fetchrow(
+            "SELECT username, password, email FROM users WHERE username = $1",
+            username
+        )
+        return dict(row) if row else None
+    finally:
+        await conn.close()
+
+# ==================== БЕЗОПАСНОСТЬ ====================
+from passlib.context import CryptContext
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+def verify_password(plain_password: str, hashed_password: str) -> bool:
+    return pwd_context.verify(plain_password, hashed_password)
+
+def get_password_hash(password: str) -> str:
+    return pwd_context.hash(password)
+        
 # ==================== HTML СТРАНИЦЫ ====================
 
 @app.get("/", response_class=HTMLResponse)
 async def home_page(request: Request):
     """Главная страница"""
     return templates.TemplateResponse("index.html", {"request": request})
-
-@app.get("/login", response_class=HTMLResponse)
-async def login_page(request: Request):
-    """Страница входа (HTML форма)"""
-    return templates.TemplateResponse("login.html", {
-        "request": request,
-        "error": None
-    })
 
 @app.post("/login", response_class=HTMLResponse)
 async def process_login(
@@ -61,7 +85,12 @@ async def process_login(
     password: str = Form(...)
 ):
     """Обработка формы входа"""
-    if username in users_db and users_db[username]["password"] == password:
+    
+    # ✅ Получаем пользователя из БД
+    user = await get_user_by_username(username)
+    
+    # ✅ Проверяем пароль через хеш
+    if user and verify_password(password, user["password"]):
         # Успешный вход - редирект на главную
         return RedirectResponse("/", status_code=302)
     else:
@@ -71,15 +100,7 @@ async def process_login(
             "error": "Неверный логин или пароль",
             "username": username
         })
-
-@app.get("/register", response_class=HTMLResponse)
-async def register_page(request: Request):
-    """Страница регистрации (HTML форма)"""
-    return templates.TemplateResponse("register.html", {
-        "request": request,
-        "error": None
-    })
-
+    
 @app.post("/register", response_class=HTMLResponse)
 async def process_register(
     request: Request,
@@ -93,14 +114,17 @@ async def process_register(
     # Валидация
     errors = []
     
-    if username in users_db:
-        errors.append("Пользователь с таким именем уже существует")
-    
     if len(password) < 6:
         errors.append("Пароль должен быть не менее 6 символов")
     
     if password != confirm_password:
         errors.append("Пароли не совпадают")
+    
+    # ✅ Проверка в БД вместо словаря
+    if not errors:
+        existing_user = await get_user_by_username(username)
+        if existing_user:
+            errors.append("Пользователь с таким именем уже существует")
     
     if errors:
         return templates.TemplateResponse("register.html", {
@@ -110,11 +134,15 @@ async def process_register(
             "email": email
         })
     
-    # Регистрация
-    users_db[username] = {
-        "password": password,
-        "email": email if email else f"{username}@example.com"
-    }
+    # ✅ Хеширование пароля (никогда не храните в открытом виде!)
+    hashed_password = get_password_hash(password)
+    
+    # ✅ Сохранение в БД вместо словаря
+    await create_user_in_db(
+        username=username,
+        hashed_password=hashed_password,
+        email=email if email else f"{username}@example.com"
+    )
     
     return templates.TemplateResponse("register_success.html", {
         "request": request,
