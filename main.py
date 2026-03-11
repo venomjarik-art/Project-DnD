@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Request, Form, HTTPException, Depends
+from fastapi import FastAPI, Request, Form, HTTPException
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -6,9 +6,11 @@ from pydantic import BaseModel
 from typing import Optional, List
 import random
 import asyncpg
-from datetime import datetime
 import os
 from dotenv import load_dotenv
+from passlib.context import CryptContext
+
+load_dotenv()
 
 app = FastAPI(title="Game API")
 
@@ -25,7 +27,6 @@ class UserRegister(BaseModel):
     password: str
     email: Optional[str] = None
 
-#новое
 class Card(BaseModel):
     id: int
     name: str
@@ -34,7 +35,6 @@ class Card(BaseModel):
     strength: int
     card_type: str
 
-#новое
 class UserWithCards(BaseModel):
     id: int
     username: str
@@ -42,11 +42,30 @@ class UserWithCards(BaseModel):
     cards: List[Card]
     total_cards: int
 
+class DiceRoll(BaseModel):
+    sides: int = 6
+    count: int = 1
+
 # ==================== РАБОТА С БД ====================
 
 async def get_db_connection():
     """Создание подключения к БД"""
     return await asyncpg.connect(DATABASE_URL)
+
+async def create_user_in_db(username: str, hashed_password: str, email: str):
+    """Создание пользователя в БД"""
+    conn = await get_db_connection()
+    try:
+        await conn.execute(
+            """
+            INSERT INTO users (username, password, email)
+            VALUES ($1, $2, $3)
+            """,
+            username, hashed_password, email
+        )
+        print(f"✅ Пользователь {username} создан в БД")
+    finally:
+        await conn.close()
 
 async def get_user_by_username(username: str):
     """Получение пользователя по имени"""
@@ -60,8 +79,33 @@ async def get_user_by_username(username: str):
     finally:
         await conn.close()
 
+async def get_all_users():
+    """Получение всех пользователей"""
+    conn = await get_db_connection()
+    try:
+        rows = await conn.fetch("SELECT id, username, email FROM users")
+        return [dict(row) for row in rows]
+    finally:
+        await conn.close()
+
+async def init_db():
+    """Инициализация таблиц в БД"""
+    conn = await get_db_connection()
+    try:
+        await conn.execute("""
+            CREATE TABLE IF NOT EXISTS users (
+                id SERIAL PRIMARY KEY,
+                username VARCHAR(50) UNIQUE NOT NULL,
+                password VARCHAR(255) NOT NULL,
+                email VARCHAR(100),
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        """)
+        print("✅ Таблицы БД созданы/проверены")
+    finally:
+        await conn.close()
+
 # ==================== БЕЗОПАСНОСТЬ ====================
-from passlib.context import CryptContext
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -70,13 +114,18 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 
 def get_password_hash(password: str) -> str:
     return pwd_context.hash(password)
-        
+
 # ==================== HTML СТРАНИЦЫ ====================
 
 @app.get("/", response_class=HTMLResponse)
 async def home_page(request: Request):
     """Главная страница"""
     return templates.TemplateResponse("index.html", {"request": request})
+
+@app.get("/login", response_class=HTMLResponse)
+async def login_page(request: Request):
+    """Страница входа (GET)"""
+    return templates.TemplateResponse("login.html", {"request": request})
 
 @app.post("/login", response_class=HTMLResponse)
 async def process_login(
@@ -85,22 +134,22 @@ async def process_login(
     password: str = Form(...)
 ):
     """Обработка формы входа"""
-    
-    # ✅ Получаем пользователя из БД
     user = await get_user_by_username(username)
     
-    # ✅ Проверяем пароль через хеш
     if user and verify_password(password, user["password"]):
-        # Успешный вход - редирект на главную
         return RedirectResponse("/", status_code=302)
     else:
-        # Ошибка - показываем форму снова
         return templates.TemplateResponse("login.html", {
             "request": request,
             "error": "Неверный логин или пароль",
             "username": username
         })
-    
+
+@app.get("/register", response_class=HTMLResponse)
+async def register_page(request: Request):
+    """Страница регистрации (GET)"""
+    return templates.TemplateResponse("register.html", {"request": request})
+
 @app.post("/register", response_class=HTMLResponse)
 async def process_register(
     request: Request,
@@ -110,8 +159,6 @@ async def process_register(
     confirm_password: str = Form(...)
 ):
     """Обработка формы регистрации"""
-    
-    # Валидация
     errors = []
     
     if len(password) < 6:
@@ -120,7 +167,6 @@ async def process_register(
     if password != confirm_password:
         errors.append("Пароли не совпадают")
     
-    # ✅ Проверка в БД вместо словаря
     if not errors:
         existing_user = await get_user_by_username(username)
         if existing_user:
@@ -134,10 +180,8 @@ async def process_register(
             "email": email
         })
     
-    # ✅ Хеширование пароля (никогда не храните в открытом виде!)
     hashed_password = get_password_hash(password)
     
-    # ✅ Сохранение в БД вместо словаря
     await create_user_in_db(
         username=username,
         hashed_password=hashed_password,
@@ -184,10 +228,6 @@ async def roll_dice_page(
 
 # ==================== API ЭНДПОИНТЫ (JSON) ====================
 
-class DiceRoll(BaseModel):
-    sides: int = 6
-    count: int = 1
-
 @app.post("/api/dice")
 async def api_roll_dice(roll: DiceRoll):
     """API для броска кубиков (JSON)"""
@@ -209,12 +249,16 @@ async def api_roll_dice(roll: DiceRoll):
 @app.get("/api/users")
 async def api_list_users():
     """API для получения списка пользователей"""
-    users_list = []
-    for username, data in users_db.items():
-        users_list.append({
-            "username": username,
-            "email": data["email"]
-        })
-    
+    users_list = await get_all_users()
     return {"users": users_list}
 
+# ==================== ЗАПУСК ПРИЛОЖЕНИЯ ====================
+
+if __name__ == "__main__":
+    import uvicorn
+    
+    # Инициализация БД перед запуском
+    import asyncio
+    asyncio.run(init_db())
+    
+    uvicorn.run(app, host="0.0.0.0", port=8000)
