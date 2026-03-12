@@ -662,6 +662,16 @@ async def api_get_user_cards():
         traceback.print_exc()
         raise
 
+@app.get("/places", response_class=HTMLResponse)
+async def places_page(request: Request):
+    try:
+        print("[DEBUG] GET /places")
+        return templates.TemplateResponse("places.html", {"request": request})
+    except Exception as e:
+        print(f"[ERROR] Ошибка places_page: {type(e).__name__}: {e}")
+        traceback.print_exc()
+        raise
+
 @app.post("/api/cards")
 async def api_create_card(card: Card):
     try:
