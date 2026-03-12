@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Создание карты персонажа</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+        
+        .content {
+            display: flex;
+            gap: 40px;
+            flex-wrap: wrap;
+        }
+        
+        .card-frame {
+            flex: 1;
+            min-width: 400px;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+        
+        .card-inner {
+            background: linear-gradient(135deg, #ffd89b 0%, #19547b 100%);
+            border-radius: 15px;
+            padding: 25px;
+            border: 5px solid gold;
+        }
+        
+        .photo-upload {
+            width: 100%;
+            height: 250px;
+            background: #000;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            cursor: pointer;
+            overflow: hidden;
+            border: 4px solid #ffd700;
+            position: relative;
+        }
+        
+        .photo-upload img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .photo-upload input[type="file"] {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            color: white;
+            font-weight: bold;
+            margin-bottom: 5px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+        
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1em;
+        }
+        
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .stat-input {
+            background: rgba(255,255,255,0.9);
+            padding: 10px;
+            border-radius: 5px;
+        }
+        
+        .stat-input label {
+            display: block;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+        
+        .stat-input input {
+            width: 100%;
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+        }
+        
+        .actions {
+            flex: 0 0 250px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .action-button {
+            padding: 15px 25px;
+            background: white;
+            color: #2a5298;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        
+        .action-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+        
+        .action-button.save {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+        }
+        
+        .action-button.back {
+            background: linear-gradient(135deg, #42275a 0%, #734b6d 100%);
+            color: white;
+        }
+        
+        .back-link {
+            display: inline-block;
+            margin-top: 20px;
+            color: white;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>✨ Создание карты персонажа</h1>
+            <a href="/dashboard" class="back-link">← Назад к dashboard</a>
+        </div>
+        
+        <form method="post" action="/save-card" enctype="multipart/form-data">
+            <div class="content">
+                <div class="card-frame">
+                    <div class="card-inner">
+                        <div class="photo-upload" onclick="document.getElementById('photo').click()">
+                            <span id="photo-preview">📷 Нажмите для загрузки фото</span>
+                            <input type="file" id="photo" name="photo" accept="image/*" onchange="previewImage(this)">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Имя персонажа:</label>
+                            <input type="text" name="name" required placeholder="Введите имя персонажа">
+                        </div>
+                        
+                        <div class="stats-grid">
+                            <div class="stat-input">
+                                <label>💪 Сила:</label>
+                                <input type="number" name="strength" min="0" max="100" value="0">
+                            </div>
+                            <div class="stat-input">
+                                <label>🤸 Ловкость:</label>
+                                <input type="number" name="agility" min="0" max="100" value="0">
+                            </div>
+                            <div class="stat-input">
+                                <label>❤️ Здоровье:</label>
+                                <input type="number" name="health" min="0" max="100" value="0">
+                            </div>
+                            <div class="stat-input">
+                                <label>⚡ Скорость:</label>
+                                <input type="number" name="speed" min="0" max="100" value="0">
+                            </div>
+                            <div class="stat-input">
+                                <label>🧠 Интеллект:</label>
+                                <input type="number" name="intelligence" min="0" max="100" value="0">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="actions">
+                    <button type="submit" class="action-button save">
+                        💾 Сохранить карточку
+                    </button>
+                    <a href="/my-cards" class="action-button back">
+                        📚 Назад к моим картам
+                    </a>
+                    <a href="/instrumentation" class="action-button">
+                        🛠️ Инструментарий
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+    
+    <script>
+        function previewImage(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const preview = document.getElementById('photo-preview');
+                    preview.innerHTML = `<img src="${e.target.result}" alt="Photo">`;
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+    </script>
+</body>
+</html>

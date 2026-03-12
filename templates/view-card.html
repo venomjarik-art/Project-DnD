@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ card.name }} - Карта персонажа</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            color: white;
+        }
+        
+        .back-button {
+            padding: 10px 25px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            transition: background 0.3s;
+        }
+        
+        .back-button:hover {
+            background: rgba(255,255,255,0.3);
+        }
+        
+        .full-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 15px 50px rgba(0,0,0,0.4);
+        }
+        
+        .card-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .card-photo-large {
+            width: 250px;
+            height: 250px;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            overflow: hidden;
+            border: 5px solid gold;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 100px;
+        }
+        
+        .card-photo-large img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .card-title {
+            font-size: 2.5em;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .section {
+            margin-bottom: 30px;
+        }
+        
+        .section-title {
+            font-size: 1.3em;
+            color: #2a5298;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        .stats-display {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+        }
+        
+        .stat-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            display: block;
+        }
+        
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+        
+        .text-content {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            line-height: 1.6;
+            white-space: pre-wrap;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #333;
+        }
+        
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1em;
+            font-family: inherit;
+        }
+        
+        .form-group textarea {
+            min-height: 150px;
+            resize: vertical;
+        }
+        
+        .actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .action-btn {
+            flex: 1;
+            min-width: 200px;
+            padding: 15px 25px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .save-btn {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+        }
+        
+        .edit-btn {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+        
+        .back-btn {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+        }
+        
+        .edit-mode .view-content {
+            display: none;
+        }
+        
+        .edit-mode .edit-content {
+            display: block;
+        }
+        
+        .view-content .text-content {
+            min-height: 100px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <a href="/my-cards" class="back-button">← Назад к картам</a>
+            <h1>Карта персонажа</h1>
+            <div style="width: 150px;"></div>
+        </div>
+        
+        <form method="post" action="/update-card/{{ card.id }}" enctype="multipart/form-data">
+            <div class="full-card" id="cardContainer">
+                <!-- Режим просмотра -->
+                <div class="view-content">
+                    <div class="card-header">
+                        <div class="card-photo-large">
+                            {% if card.photo_url %}
+                            <img src="{{ card.photo_url }}" alt="{{ card.name }}">
+                            {% else %}
+                            🎭
+                            {% endif %}
+                        </div>
+                        <h2 class="card-title">{{ card.name }}</h2>
+                    </div>
+                    
+                    <div class="section">
+                        <h3 class="section-title">📊 Основные характеристики</h3>
+                        <div class="stats-display">
+                            <div class="stat-box">
+                                <span class="stat-value">{{ card.strength }}</span>
+                                <span class="stat-label">💪 Сила</span>
+                            </div>
+                            <div class="stat-box">
+                                <span class="stat-value">{{ card.agility }}</span>
+                                <span class="stat-label">🤸 Ловкость</span>
+                            </div>
+                            <div class="stat-box">
+                                <span class="stat-value">{{ card.health }}</span>
+                                <span class="stat-label">❤️ Здоровье</span>
+                            </div>
+                            <div class="stat-box">
+                                <span class="stat-value">{{ card.speed }}</span>
+                                <span class="stat-label">⚡ Скорость</span>
+                            </div>
+                            <div class="stat-box">
+                                <span class="stat-value">{{ card.intelligence }}</span>
+                                <span class="stat-label">🧠 Интеллект</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {% if card.backstory %}
+                    <div class="section">
+                        <h3 class="section-title">📖 Предыстория</h3>
+                        <div class="text-content">{{ card.backstory }}</div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if card.personality %}
+                    <div class="section">
+                        <h3 class="section-title">🎭 Характер</h3>
+                        <div class="text-content">{{ card.personality }}</div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if card.traits %}
+                    <div class="section">
+                        <h3 class="section-title">✨ Особенности</h3>
+                        <div class="text-content">{{ card.traits }}</div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if card.equipment %}
+                    <div class="section">
+                        <h3 class="section-title">🎒 Снаряжение</h3>
+                        <div class="text-content">{{ card.equipment }}</div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if card.abilities %}
+                    <div class="section">
+                        <h3 class="section-title">⚔️ Способности</h3>
+                        <div class="text-content">{{ card.abilities }}</div>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Режим редактирования (скрыт по умолчанию) -->
+                <div class="edit-content" style="display: none;">
+                    <div class="form-group">
+                        <label>Фото персонажа:</label>
+                        <input type="file" name="photo" accept="image/*">
+                        {% if card.photo_url %}
+                        <p style="margin-top: 10px; font-size: 0.9em; color: #666;">
+                            Текущее фото загружено
+                        </p>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Имя персонажа:</label>
+                        <input type="text" name="name" value="{{ card.name }}" required>
+                    </div>
+                    
+                    <div class="section">
+                        <h3 class="section-title">📊 Основные характеристики</h3>
+                        <div class="stats-display">
+                            <div class="form-group">
+                                <label>💪 Сила:</label>
+                                <input type="number" name="strength" value="{{ card.strength }}" min="0" max="100">
+                            </div>
+                            <div class="form-group">
+                                <label>🤸 Ловкость:</label>
+                                <input type="number" name="agility" value="{{ card.agility }}" min="0" max="100">
+                            </div>
+                            <div class="form-group">
+                                <label>❤️ Здоровье:</label>
+                                <input type="number" name="health" value="{{ card.health }}" min="0" max="100">
+                            </div>
+                            <div class="form-group">
+                                <label>⚡ Скорость:</label>
+                                <input type="number" name="speed" value="{{ card.speed }}" min="0" max="100">
+                            </div>
+                            <div class="form-group">
+                                <label>🧠 Интеллект:</label>
+                                <input type="number" name="intelligence" value="{{ card.intelligence }}" min="0" max="100">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="section">
+                        <h3 class="section-title">📖 Дополнительные характеристики</h3>
+                        
+                        <div class="form-group">
+                            <label>Предыстория:</label>
+                            <textarea name="backstory" placeholder="Расскажите о прошлом персонажа...">{{ card.backstory or '' }}</textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Характер:</label>
+                            <textarea name="personality" placeholder="Опишите характер и личность...">{{ card.personality or '' }}</textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Особенности и черты:</label>
+                            <textarea name="traits" placeholder="Уникальные особенности персонажа...">{{ card.traits or '' }}</textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Снаряжение:</label>
+                            <textarea name="equipment" placeholder="Оружие, броня, предметы...">{{ card.equipment or '' }}</textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Способности и навыки:</label>
+                            <textarea name="abilities" placeholder="Магия, умения, специальные способности...">{{ card.abilities or '' }}</textarea>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="actions">
+                    <button type="button" class="action-btn edit-btn" onclick="toggleEdit()" id="editBtn">
+                        ✏️ Редактировать
+                    </button>
+                    <button type="submit" class="action-btn save-btn" id="saveBtn" style="display: none;">
+                        💾 Сохранить изменения
+                    </button>
+                    <button type="button" class="action-btn back-btn" onclick="cancelEdit()" id="cancelBtn" style="display: none;">
+                        ❌ Отмена
+                    </button>
+                    <a href="/my-cards" class="action-btn back-btn" style="text-align: center; text-decoration: none; display: inline-block;">
+                        📚 К моим картам
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+    
+    <script>
+        let isEditMode = false;
+        
+        function toggleEdit() {
+            isEditMode = !isEditMode;
+            const container = document.getElementById('cardContainer');
+            const editBtn = document.getElementById('editBtn');
+            const saveBtn = document.getElementById('saveBtn');
+            const cancelBtn = document.getElementById('cancelBtn');
+            
+            if (isEditMode) {
+                container.classList.add('edit-mode');
+                document.querySelector('.edit-content').style.display = 'block';
+                document.querySelector('.view-content').style.display = 'none';
+                editBtn.style.display = 'none';
+                saveBtn.style.display = 'inline-block';
+                cancelBtn.style.display = 'inline-block';
+            }
+        }
+        
+        function cancelEdit() {
+            location.reload();
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Инструментарий</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            color: white;
+        }
+        
+        .back-button {
+            padding: 10px 25px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            transition: background 0.3s;
+        }
+        
+        .back-button:hover {
+            background: rgba(255,255,255,0.3);
+        }
+        
+        .instrumentation-panel {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 15px 50px rgba(0,0,0,0.4);
+        }
+        
+        h1 {
+            color: #2a5298;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+        }
+        
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .tool-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        
+        .tool-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .tool-card h3 {
+            margin-bottom: 10px;
+            font-size: 1.3em;
+        }
+        
+        .tool-card p {
+            opacity: 0.9;
+            font-size: 0.95em;
+        }
+        
+        .section {
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 2px solid #e0e0e0;
+        }
+        
+        .section h2 {
+            color: #2a5298;
+            margin-bottom: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        .form-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        
+        .form-group textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 1em;
+            font-family: inherit;
+            min-height: 150px;
+            resize: vertical;
+        }
+        
+        .help-text {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 8px;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        .action-btn {
+            flex: 1;
+            padding: 15px 25px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            text-align: center;
+        }
+        
+        .save-btn {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+        }
+        
+        .back-btn {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <a href="/dashboard" class="back-button">← Назад</a>
+            <h1>🛠️ Инструментарий</h1>
+            <div style="width: 150px;"></div>
+        </div>
+        
+        <div class="instrumentation-panel">
+            <h2>Расширенные возможности редактирования карт</h2>
+            <p class="subtitle">Здесь вы можете добавить детальную информацию о ваших персонажах</p>
+            
+            <div class="tools-grid">
+                <div class="tool-card" onclick="document.getElementById('backstorySection').scrollIntoView({behavior: 'smooth'})">
+                    <h3>📖 Предыстория</h3>
+                    <p>Расскажите историю происхождения персонажа, его прошлое и важные события</p>
+                </div>
+                
+                <div class="tool-card" onclick="document.getElementById('personalitySection').scrollIntoView({behavior: 'smooth'})">
+                    <h3>🎭 Характер и личность</h3>
+                    <p>Опишите черты характера, темперамент, привычки и особенности поведения</p>
+                </div>
+                
+                <div class="tool-card" onclick="document.getElementById('abilitiesSection').scrollIntoView({behavior: 'smooth'})">
+                    <h3>⚔️ Способности</h3>
+                    <p>Магические умения, боевые навыки, специальные способности и таланты</p>
+                </div>
+                
+                <div class="tool-card" onclick="document.getElementById('equipmentSection').scrollIntoView({behavior: 'smooth'})">
+                    <h3>🎒 Снаряжение</h3>
+                    <p>Оружие, броня, магические предметы и другое снаряжение персонажа</p>
+                </div>
+            </div>
+            
+            <form method="post" action="/update-instrumentation">
+                <div class="section" id="backstorySection">
+                    <h2>📖 Подробная предыстория</h2>
+                    <div class="form-group">
+                        <label>История происхождения:</label>
+                        <textarea name="backstory_extended" placeholder="Расскажите полную историю вашего персонажа: где он родился, какие события сформировали его личность, важные встречи и приключения..."></textarea>
+                        <p class="help-text">Минимум 100 символов для детальной проработки</p>
+                    </div>
+                </div>
+                
+                <div class="section" id="personalitySection">
+                    <h2>🎭 Детальное описание характера</h2>
+                    <div class="form-group">
+                        <label>Личность и черты характера:</label>
+                        <textarea name="personality_extended" placeholder="Опишите характер: добрый или злой, общительный или замкнутый, храбрый или осторожный. Какие ценности важны для персонажа?"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Привычки и особенности:</label>
+                        <textarea name="habits" placeholder="Уникальные привычки, манера речи, жесты, предпочтения в еде и т.д."></textarea>
+                    </div>
+                </div>
+                
+                <div class="section" id="abilitiesSection">
+                    <h2>⚔️ Способности и навыки</h2>
+                    <div class="form-group">
+                        <label>Боевые умения:</label>
+                        <textarea name="combat_skills" placeholder="Владение оружием, боевые стили, тактические навыки..."></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Магические способности:</label>
+                        <textarea name="magic_abilities" placeholder="Заклинания, магические школы, особые силы..."></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Прочие навыки:</label>
+                        <textarea name="other_skills" placeholder="Ремесла, знания, социальные навыки, языки..."></textarea>
+                    </div>
+                </div>
+                
+                <div class="section" id="equipmentSection">
+                    <h2>🎒 Снаряжение и имущество</h2>
+                    <div class="form-group">
+                        <label>Оружие:</label>
+                        <textarea name="weapons" placeholder="Основное и дополнительное оружие, его характеристики..."></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Броня и защита:</label>
+                        <textarea name="armor" placeholder="Доспехи, щиты, магическая защита..."></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Магические предметы:</label>
+                        <textarea name="magic_items" placeholder="Артефакты, зелья, свитки, кольца..."></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Прочее снаряжение:</label>
+                        <textarea name="other_equipment" placeholder="Инструменты, припасы, личные вещи..."></textarea>
+                    </div>
+                </div>
+                
+                <div class="action-buttons">
+                    <button type="submit" class="action-btn save-btn">
+                        💾 Сохранить все изменения
+                    </button>
+                    <a href="/dashboard" class="action-btn back-btn" style="text-decoration: none; display: inline-block;">
+                        ← На главную
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
