@@ -435,12 +435,13 @@ async def process_register(
             email=email if email else f"{username}@example.com"
         )
         
-        print(f"[DEBUG] ✅ Регистрация успешна: {username}")
-        return templates.TemplateResponse("register_success.html", {
-            "request": request, "username": username
-        })
+        print(f"[DEBUG] Регистрация успешна: {username}")
+        # Перенаправляем на dashboard
+        response = RedirectResponse("/dashboard", status_code=302)
+        return response
+        
     except Exception as e:
-        print(f"[ERROR] ❌ Ошибка process_register: {type(e).__name__}: {e}")
+        print(f"[ERROR] Ошибка process_register: {type(e).__name__}: {e}")
         traceback.print_exc()
         raise
 
@@ -450,7 +451,7 @@ async def dice_page(request: Request):
         print("[DEBUG] GET /dice")
         return templates.TemplateResponse("dice.html", {"request": request, "result": None})
     except Exception as e:
-        print(f"[ERROR] ❌ Ошибка dice_page: {type(e).__name__}: {e}")
+        print(f"[ERROR] Ошибка dice_page: {type(e).__name__}: {e}")
         traceback.print_exc()
         raise
 
