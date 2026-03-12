@@ -45,7 +45,7 @@ class DiceRoll(BaseModel):
     sides: int = 6
     count: int = 1
 
-DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://postgres:123@127.0.0.1:5432/dnd_database?ssl=disable")
+DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://postgres:12345@127.0.0.1:5432/dnd_database")
 
 async def get_db_connection():
     try:
