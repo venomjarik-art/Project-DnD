@@ -5,37 +5,247 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Вход в систему</title>
     <style>
-        body { font-family: Arial, sans-serif; max-width: 400px; margin: 50px auto; padding: 20px; }
-        .form-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; }
-        input { width: 100%; padding: 8px; box-sizing: border-box; }
-        button { background: #28a745; color: white; border: none; padding: 10px 20px; cursor: pointer; }
-        .error { color: red; margin-bottom: 15px; }
-        .back { display: block; margin-top: 20px; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .container {
+            max-width: 450px;
+            width: 100%;
+            margin: 0 auto;
+        }
+        
+        .login-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 15px 50px rgba(0,0,0,0.4);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            color: #2a5298;
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            color: #666;
+            font-size: 1em;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        .form-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #333;
+            font-size: 0.95em;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1em;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #2a5298;
+            box-shadow: 0 0 0 3px rgba(42, 82, 152, 0.1);
+        }
+        
+        .form-group input.error {
+            border-color: #e74c3c;
+        }
+        
+        .error-message {
+            color: #e74c3c;
+            font-size: 0.9em;
+            margin-top: 5px;
+            display: block;
+        }
+        
+        .global-error {
+            background: #fee;
+            color: #c0392b;
+            padding: 12px 15px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            font-size: 0.95em;
+            border-left: 4px solid #c0392b;
+        }
+        
+        .button-group {
+            margin-top: 30px;
+        }
+        
+        .btn-primary {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.2em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+        
+        .links {
+            margin-top: 25px;
+            text-align: center;
+        }
+        
+        .links a {
+            display: inline-block;
+            margin: 0 10px;
+            color: #2a5298;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        
+        .links a:hover {
+            color: #1e3c72;
+            text-decoration: underline;
+        }
+        
+        .separator {
+            color: #ddd;
+            margin: 0 5px;
+        }
+        
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            color: #666;
+            text-decoration: none;
+            font-size: 0.95em;
+            transition: color 0.3s;
+        }
+        
+        .back-link:hover {
+            color: #2a5298;
+        }
+        
+        .test-users {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            font-size: 0.9em;
+        }
+        
+        .test-users h3 {
+            color: #2a5298;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+        
+        .test-users ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .test-users li {
+            padding: 5px 0;
+            color: #666;
+            font-family: monospace;
+        }
+        
+        .test-users code {
+            background: #e9ecef;
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: #c0392b;
+        }
+        
+        .footer {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #f0f0f0;
+        }
     </style>
 </head>
 <body>
-    <h1>🔐 Вход в систему</h1>
-    
-    {% if error %}
-    <div class="error">{{ error }}</div>
-    {% endif %}
-    
-    <form method="post" action="/login">
-        <div class="form-group">
-            <label>Имя пользователя:</label>
-            <input type="text" name="username" value="{{ username or '' }}" required>
+    <div class="container">
+        <div class="login-card">
+            <div class="header">
+                <h1>🔐 Вход в систему</h1>
+                <p>Войдите в свой аккаунт</p>
+            </div>
+            
+            {% if error %}
+            <div class="global-error">
+                ⚠️ {{ error }}
+            </div>
+            {% endif %}
+            
+            <form method="post" action="/login">
+                <div class="form-group">
+                    <label>Имя пользователя:</label>
+                    <input type="text" name="username" value="{{ username or '' }}" required placeholder="Введите логин">
+                </div>
+                
+                <div class="form-group">
+                    <label>Пароль:</label>
+                    <input type="password" name="password" required placeholder="Введите пароль">
+                </div>
+                
+                <div class="button-group">
+                    <button type="submit" class="btn-primary">
+                        🚪 Войти
+                    </button>
+                </div>
+            </form>
+            
+            <div class="test-users">
+                <h3>🎮 Тестовые пользователи:</h3>
+                <ul>
+                    <li><code>Данил Колбасенко</code> — <code>123456</code></li>
+                </ul>
+            </div>
+            
+            <div class="footer">
+                <div class="links">
+                    <a href="/register">📝 Нет аккаунта? Зарегистрироваться</a>
+                    <span class="separator">•</span>
+                    <a href="/" class="back-link">← На главную</a>
+                </div>
+            </div>
         </div>
-        
-        <div class="form-group">
-            <label>Пароль:</label>
-            <input type="password" name="password" required>
-        </div>
-        
-        <button type="submit">Войти</button>
-    </form>
-    
-    <a href="/register" class="back">Нет аккаунта? Зарегистрироваться</a>
-    <a href="/" class="back">← На главную</a>
+    </div>
 </body>
 </html>
