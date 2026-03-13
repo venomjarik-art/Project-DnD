@@ -370,7 +370,7 @@ async def process_login(request: Request, username: str = Form(...), password: s
         user = await get_user_by_username(username)
         if user and verify_password(password, user["password"]):
             print(f"[DEBUG] ✅ Вход успешен: {username}")
-            # Передаём username через query parameter
+            # 🔥 ВАЖНО: передаём username через query parameter
             response = RedirectResponse(f"/dashboard?username={username}", status_code=302)
             return response
         else:
@@ -437,8 +437,8 @@ async def process_register(
         )
         
         print(f"[DEBUG] Регистрация успешна: {username}")
-        # Перенаправляем на dashboard
-        response = RedirectResponse("/dashboard", status_code=302)
+        # Перенаправляем на dashboard с именем пользователя
+        response = RedirectResponse(f"/dashboard?username={username}", status_code=302)
         return response
         
     except Exception as e:
