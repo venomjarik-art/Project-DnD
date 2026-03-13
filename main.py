@@ -370,7 +370,8 @@ async def process_login(request: Request, username: str = Form(...), password: s
         user = await get_user_by_username(username)
         if user and verify_password(password, user["password"]):
             print(f"[DEBUG] ✅ Вход успешен: {username}")
-            response = RedirectResponse("/dashboard", status_code=302)
+            # Передаём username через query parameter
+            response = RedirectResponse(f"/dashboard?username={username}", status_code=302)
             return response
         else:
             print(f"[DEBUG] ❌ Вход неудачен: {username}")
@@ -381,7 +382,7 @@ async def process_login(request: Request, username: str = Form(...), password: s
         print(f"[ERROR] ❌ Ошибка process_login: {type(e).__name__}: {e}")
         traceback.print_exc()
         raise
-
+    
 @app.get("/register", response_class=HTMLResponse)
 async def register_page(request: Request):
     try:
