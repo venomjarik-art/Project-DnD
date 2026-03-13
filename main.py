@@ -382,7 +382,7 @@ async def process_login(request: Request, username: str = Form(...), password: s
         print(f"[ERROR] ❌ Ошибка process_login: {type(e).__name__}: {e}")
         traceback.print_exc()
         raise
-    
+
 @app.get("/register", response_class=HTMLResponse)
 async def register_page(request: Request):
     try:
@@ -476,12 +476,15 @@ async def roll_dice_page(request: Request, sides: int = Form(6), count: int = Fo
         raise
 
 @app.get("/dashboard", response_class=HTMLResponse)
-async def dashboard(request: Request):
+async def dashboard(request: Request, username: str = "Гость"):
     try:
-        print("[DEBUG] GET /dashboard")
-        return templates.TemplateResponse("dashboard.html", {"request": request, "username": "Player"})
+        print(f"[DEBUG] GET /dashboard, username={username}")
+        return templates.TemplateResponse("dashboard.html", {
+            "request": request, 
+            "username": username
+        })
     except Exception as e:
-        print(f"[ERROR] ❌ Ошибка dashboard: {type(e).__name__}: {e}")
+        print(f"[ERROR] Ошибка dashboard: {type(e).__name__}: {e}")
         traceback.print_exc()
         raise
 
